@@ -7,6 +7,7 @@ const fs      = require("fs");
 
 /** Read CLI args */
 let _ = getOpts(process.argv.slice(2), {
+	"-?, -h, --help":                       "",
 	"-m, --mutilate":                       "<bool>",
 	"-u, --underline-urls":                 "<bool>",
 	"-i, -t, --tab, --indent":              "<string|int>",
@@ -16,6 +17,30 @@ let _ = getOpts(process.argv.slice(2), {
 /** Would've used `let {options, argv} = getOpts`, but hey, no native destructuring support yet */
 let options       = _.options;
 let argv          = _.argv;
+
+
+/** Print help and bail if that's what the user wanted */
+if(options.help){
+	const path = require("path");
+	let name   = path.basename(process.argv[1]);
+	let help   = `
+	Usage: ${name} [options] <filename>
+
+	Pretty-print JSON data for terminal output.
+
+	Options:
+
+	  -m, --mutilate <bool>         Unquote property identifiers
+	  -u, --underline-urls <bool>   Add underlines to URLs
+	  -c, --colour <bool>           Colourise the prettified output
+	  -i, --indent <size>           Indentation width, expressed in spaces
+
+	Run \`man ppjson' for full documentation.
+	`.replace(/\t+/g, "    ");
+	
+	console.log(help);
+	process.exit(0);
+}
 
 /** Parse our options and normalise their defaults */
 let mutilate      = options.m === undefined ? true : bool(options.m);

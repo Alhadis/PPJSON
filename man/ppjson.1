@@ -21,7 +21,6 @@ JSON data can be supplied by \fIfilename\fP, or piped through standard input:
 .RE
 .fi
 .SH OPTIONS
-.TP
 .IP "\fB\-m\fP \fIBOOL\fP, \fB\-\-mutilate\fP=\fIBOOL\fP"
 Unquote property identifiers in object literals:
 .PP
@@ -51,18 +50,20 @@ For instance, to lay your data out using real indentation:      \" Yes, I'm bias
     \fBppjson\fP \-\-indent=$'\\t' data.json
 .RE
 .fi
+.IP "\fB\-?\fP, \fB\-h\fP, \fB\-\-help\fP"
+Display a brief help summary and exit.
 .SH PASSING OPTIONS
 The \fIBOOL\fP options described above are all enabled by default.
 You can disable them by passing \fB0\fP, \fBfalse\fP, \fBno\fP or \fBoff\fP as values (their capitalisation doesn't matter):
 .nf
 .RS
     
-    # All these lines are equivalent
-    \fBppjson\fP \-\-mutilate=no
-    \fBppjson\fP \-\-mutilate OFF
-    \fBppjson\fP \-\-mutilate 0
-    \fBppjson\fP  \-m0
-    \fBppjson\fP \-\-mutilate false
+# All these lines are equivalent
+\fBppjson\fP \-\-mutilate=no
+\fBppjson\fP \-\-mutilate OFF
+\fBppjson\fP \-\-mutilate 0
+\fBppjson\fP  \-m0
+\fBppjson\fP \-\-mutilate false
     
 .RE
 .fi
@@ -70,9 +71,9 @@ Option order is inconsequential; they may be listed before or after a filename:
 .nf
 .RS
     
-    # Same damn thing
-    \fBppjson\fP \-m0 file.json
-    \fBppjson\fP file.json \-m0
+# Same damn thing
+\fBppjson\fP \-m0 file.json
+\fBppjson\fP file.json \-m0
     
 .RE
 .fi
@@ -81,9 +82,9 @@ Use 2\-spaces instead of 4:
 .PP
 .nf
 .RS
-    # Both do the same thing:
-    \fBppjson\fP \-\-tab=2    file.json
-    \fBppjson\fP \-\-indent=2 file.json
+# Both do the same thing:
+\fBppjson\fP \-\-tab=2    file.json
+\fBppjson\fP \-\-indent=2 file.json
 .RE
 .fi
 .PP
@@ -91,7 +92,7 @@ Disable colours:
 .PP
 .nf
 .RS
-    \fBppjson\fP \-c0 < file.json
+\fBppjson\fP \-c0 < file.json
 .RE
 .fi
 .PP
@@ -99,8 +100,8 @@ Don't remove quote marks from property names:
 .PP
 .nf
 .RS
-    \fBppjson\fP \-m false file.json
-    \fBppjson\fP \-\-mutilate no < file.json
+\fBppjson\fP \-m false file.json
+\fBppjson\fP \-\-mutilate no < file.json
 .RE
 .fi
 .SH EXIT STATUS
