@@ -11,7 +11,8 @@ let _ = getOpts(process.argv.slice(2), {
 	"-m, --mutilate":                       "<bool>",
 	"-u, --underline-urls":                 "<bool>",
 	"-i, --indent":                         "<size>",
-	"-c, --colour, --colours, --colourise": "<bool>"
+	"-c, --colour, --colours, --colourise": "<bool>",
+	"-a, --alphabetise":                    ""
 });
 
 /** Would've used `let {options, argv} = getOpts`, but hey, no native destructuring support yet */
@@ -34,6 +35,7 @@ if(options.help){
 	  -u, --underline-urls <bool>   Add underlines to URLs
 	  -c, --colour <bool>           Colourise the prettified output
 	  -i, --indent <size>           Indentation width, expressed in spaces
+	  -a, --alphabetise             Order properties alphabetically
 
 	Run \`man ppjson' for full documentation.
 	`.replace(/\t+/g, "    ");
@@ -43,10 +45,11 @@ if(options.help){
 }
 
 /** Parse our options and normalise their defaults */
-let mutilate      = options.m === undefined ? true : bool(options.m);
-let underlineURLs = options.u === undefined ? true : bool(options.u);
-let colourise     = options.c === undefined ? true : bool(options.c);
-let indentSize    = options.i === undefined ? 4    : options.indent;
+let mutilate      = options.m === undefined ? true  : bool(options.m);
+let underlineURLs = options.u === undefined ? true  : bool(options.u);
+let colourise     = options.c === undefined ? true  : bool(options.c);
+let indentSize    = options.i === undefined ? 4     : options.indent;
+let alphabetise   = options.a === undefined ? false : options.alphabetise;
 let indent        = Array(Math.max(1, indentSize) + 1).join(" ");
 
 
@@ -107,13 +110,62 @@ function bool(input){
 }
 
 
+
+/**
+ * Recursively alphabetise the enumerable properties of an object.
+ *
+ * This function returns a copy of the original object with all properties
+ * listed in alphabetic order, rather than enumeration order. The original
+ * object is unmodified.
+ *
+ * @param {Object}  input
+ * @param {Boolean} strictCase - If TRUE, will order case-sensitively (capitals first)
+ * @return {Object}
+ */
+function alphabetiseProperties(input, strictCase){
+	let stringTag = Object.prototype.toString.call(input);
+	
+	/** Regular JavaScript object; enumerate properties */
+	if("[object Object]" === stringTag){
+		let keys = Object.keys(input);
+		
+		keys = strictCase ? keys.sort() : keys.sort((a, b) => {
+			let A = a.toLowerCase();
+			let B = b.toLowerCase();
+			if(A < B) return -1;
+			if(A > B) return 1;
+			return 0;
+		});
+		
+		let result = {};
+		for(let i of keys)
+			result[i] = alphabetiseProperties(input[i]);
+		return result;
+	}
+	
+	/** This is an array; make sure the properties of its values are sorted too */
+	else if("[object Array]" === stringTag)
+		return Array.prototype.map.call(input, e => alphabetiseProperties(e));
+	
+	/** Just return it untouched */
+	return input;
+}
+
+
+
 /**
  * Spruce up JSON for console display.
  *
  * @param {String}
  */
 function prettifyJSON(input){
-	let output = JSON.stringify(JSON.parse(input), null, indent);
+	let output = JSON.parse(input);
+	
+	/** Order the properties of objects by alphabetical order, not enumeration order */
+	if(alphabetise)
+		output = alphabetiseProperties(output);
+	
+	output = JSON.stringify(output, null, indent);
 	
 	
 	/** Unquote property identifiers in object literals */

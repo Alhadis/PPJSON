@@ -30,6 +30,7 @@ Options
 -u, --underline-urls     [bool]     Decorate URL patterns with underlines
 -c, --colour             [bool]     Colourises the prettified output
 -i, --indent             [size]     Indentation width, expressed in spaces. Default: 4
+-a, --alphabetise                   Order properties alphabetically
 ```
 
 The `[bool]` options above are all enabled by default.
