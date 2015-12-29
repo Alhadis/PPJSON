@@ -21,6 +21,7 @@ JSON data can be supplied by \fIfilename\fP, or piped through standard input:
 .RE
 .fi
 .SH OPTIONS
+Each boolean option mentioned below is enabled by default.
 .IP "\fB\-m\fP \fIBOOL\fP, \fB\-\-mutilate\fP=\fIBOOL\fP"
 Unquote property identifiers in object literals:
 .PP
@@ -38,18 +39,8 @@ Unsafe property identifiers are left untouched:
 Decorate URL patterns with underlines.
 .IP "\fB\-c\fP \fIBOOL\fP, \fB\-\-colour\fP=\fIBOOL\fP, \fB\-\-colours\fP=\fIBOOL\fP, \fB\-\-colourise\fP=\fIBOOL\fP"
 Colourise the beautified output. Turning this off disables colours.
-.IP "\fB\-i\fP \fIWIDTH\fP, \fB\-\-indent\fP=\fIWIDTH\fP, \fB\-t\fP \fIWIDTH\fP, \fB\-\-tab\fP=\fIWIDTH\fP"
+.IP "\fB\-i\fP \fIWIDTH\fP, \fB\-\-indent\fP=\fIWIDTH\fP"
 Set the width of each indentation level, expressed in spaces.
-.sp
-Alternatively, a string may be supplied to provide the characters of each indentation level instead.
-.sp
-For instance, to lay your data out using real indentation:      \" Yes, I'm biased. Deal with it. #tabs4life
-.sp
-.nf
-.RS
-    \fBppjson\fP \-\-indent=$'\\t' data.json
-.RE
-.fi
 .IP "\fB\-?\fP, \fB\-h\fP, \fB\-\-help\fP"
 Display a brief help summary and exit.
 .SH PASSING OPTIONS
@@ -78,34 +69,19 @@ Option order is inconsequential; they may be listed before or after a filename:
 .RE
 .fi
 .SH EXAMPLES
-Use 2\-spaces instead of 4:
-.PP
-.nf
-.RS
-# Both do the same thing:
-\fBppjson\fP \-\-tab=2    file.json
+.TP
+Use 2 spaces instead of 4:
 \fBppjson\fP \-\-indent=2 file.json
-.RE
-.fi
-.PP
+.TP
 Disable colours:
-.PP
-.nf
-.RS
 \fBppjson\fP \-c0 < file.json
-.RE
-.fi
-.PP
+.TP
 Don't remove quote marks from property names:
-.PP
-.nf
-.RS
 \fBppjson\fP \-m false file.json
+.br
 \fBppjson\fP \-\-mutilate no < file.json
-.RE
-.fi
 .SH EXIT STATUS
-\fBppjson\fP exits \fB2\fP if the specified filename could not be accessed or found; otherwise, it returns the usual 0.
+If a specified filename couldn't be accessed or located, the program exits with an error code of \fB2\fP.
 .SH AUTHOR
 Copyright (c) 2016 John Gardner <\fIgardnerjohng@gmail.com\fP>.
 .PP
