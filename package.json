@@ -1,5 +1,5 @@
 {
-	"name":         "PPJSON",
+	"name":         "ppjson",
 	"version":      "1.0.0",
 	"author":       "John Gardner <gardnerjohng@gmail.com>",
 	"description":  "Small command-line utility to pretty-print JSON files. Colour included.",
