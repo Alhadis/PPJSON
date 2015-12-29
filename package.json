@@ -1,0 +1,15 @@
+{
+	"name":         "PPJSON",
+	"version":      "1.0.0",
+	"author":       "John Gardner <gardnerjohng@gmail.com>",
+	"description":  "Small command-line utility to pretty-print JSON files. Colour included.",
+	"keywords":     ["pretty-print", "JSON", "pretty print", "beautify", "terminal", "CLI", "command-line"],
+	"repository":   "Alhadis/PPJSON",
+	"bugs":         "https://github.com/Alhadis/PPJSON/issues",
+	"license":      "ISC",
+	"preferGlobal": true,
+	"directories":  {"man":    "./man"},
+	"bin":          {"ppjson": "./index.js"},
+	"engines":      {"node":   ">=5.0.0"},
+	"dependencies": {"get-options": "*"}
+}

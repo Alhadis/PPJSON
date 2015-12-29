@@ -1,0 +1,111 @@
+.TH PPJSON 1 "2015-12-30" "PPJSON v1.0.0" "JSON Pretty Printer"
+.\"
+.\"       It's hand-written, baby
+.\"
+.nh   .\" Disable hyphenation
+.ad l .\" Disable justification: left-align only
+.SH NAME
+\fBppjson\fP \-\- Pretty\-print JSON data for terminal output
+.SH SYNOPSIS
+\fBppjson\fP [\fIoptions\fP] \fIfilename\fP
+.SH DESCRIPTION
+Pretty\-print and colourise JSON data for terminal display.
+.PP
+JSON data can be supplied by \fIfilename\fP, or piped through standard input:
+.PP
+.nf
+.RS
+\fBppjson\fP json.file
+\fBppjson\fP < json.file
+\fBnode\fP generate-and-echo-json.js | ppjson
+.RE
+.fi
+.SH OPTIONS
+.TP
+.IP "\fB\-m\fP \fIBOOL\fP, \fB\-\-mutilate\fP=\fIBOOL\fP"
+Unquote property identifiers in object literals:
+.PP
+.nf
+.RS
+       { "okay" : true }  # Before
+    \fB\->\fP {  okay  : true }  # After
+    
+Unsafe property identifiers are left untouched:
+    
+       { "o.k?" : false }  # Before AND after
+.RE
+.fi
+.IP "\fB\-u\fP \fIBOOL\fP, \fB\-\-underline\-urls\fP=\fIBOOL\fP"
+Decorate URL patterns with underlines.
+.IP "\fB\-c\fP \fIBOOL\fP, \fB\-\-colour\fP=\fIBOOL\fP, \fB\-\-colours\fP=\fIBOOL\fP, \fB\-\-colourise\fP=\fIBOOL\fP"
+Colourise the beautified output. Turning this off disables colours.
+.IP "\fB\-i\fP \fIWIDTH\fP, \fB\-\-indent\fP=\fIWIDTH\fP, \fB\-t\fP \fIWIDTH\fP, \fB\-\-tab\fP=\fIWIDTH\fP"
+Set the width of each indentation level, expressed in spaces.
+.sp
+Alternatively, a string may be supplied to provide the characters of each indentation level instead.
+.sp
+For instance, to lay your data out using real indentation:      \" Yes, I'm biased. Deal with it. #tabs4life
+.sp
+.nf
+.RS
+    \fBppjson\fP \-\-indent=$'\\t' data.json
+.RE
+.fi
+.SH PASSING OPTIONS
+The \fIBOOL\fP options described above are all enabled by default.
+You can disable them by passing \fB0\fP, \fBfalse\fP, \fBno\fP or \fBoff\fP as values (their capitalisation doesn't matter):
+.nf
+.RS
+    
+    # All these lines are equivalent
+    \fBppjson\fP \-\-mutilate=no
+    \fBppjson\fP \-\-mutilate OFF
+    \fBppjson\fP \-\-mutilate 0
+    \fBppjson\fP  \-m0
+    \fBppjson\fP \-\-mutilate false
+    
+.RE
+.fi
+Option order is inconsequential; they may be listed before or after a filename:
+.nf
+.RS
+    
+    # Same damn thing
+    \fBppjson\fP \-m0 file.json
+    \fBppjson\fP file.json \-m0
+    
+.RE
+.fi
+.SH EXAMPLES
+Use 2\-spaces instead of 4:
+.PP
+.nf
+.RS
+    # Both do the same thing:
+    \fBppjson\fP \-\-tab=2    file.json
+    \fBppjson\fP \-\-indent=2 file.json
+.RE
+.fi
+.PP
+Disable colours:
+.PP
+.nf
+.RS
+    \fBppjson\fP \-c0 < file.json
+.RE
+.fi
+.PP
+Don't remove quote marks from property names:
+.PP
+.nf
+.RS
+    \fBppjson\fP \-m false file.json
+    \fBppjson\fP \-\-mutilate no < file.json
+.RE
+.fi
+.SH EXIT STATUS
+\fBppjson\fP exits \fB2\fP if the specified filename could not be accessed or found; otherwise, it returns the usual 0.
+.SH AUTHOR
+Copyright (c) 2016 John Gardner <\fIgardnerjohng@gmail.com\fP>.
+.PP
+Freely released under the ISC license. See also \fIhttp://opensource.org/licenses/ISC\fP.
