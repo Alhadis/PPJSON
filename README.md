@@ -29,8 +29,7 @@ Options
 -m, --mutilate           [bool]     Unquote property identifiers in object literals
 -u, --underline-urls     [bool]     Decorate URL patterns with underlines
 -c, --colour             [bool]     Colourises the prettified output
--i, -t, --tab, --indent  [string]   String used for each level of indentation. Defaults to 4-spaces.
-                         [int]      If a number's passed, it sets the number of spaces instead.
+-i, --indent             [size]     Indentation width, expressed in spaces. Default: 4
 ```
 
 The `[bool]` options above are all enabled by default.
@@ -53,10 +52,8 @@ Option order is inconsequential: it doesn't matter if they're listed before or a
 Examples
 --------
 
-Use 2-spaces for indentation instead of 4:
+Use 2 spaces for indentation instead of 4:
 
-    # Both do the same thing:
-    ppjson --tab=2    file.json
     ppjson --indent=2 file.json
 
 Disable colours:

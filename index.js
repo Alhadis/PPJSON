@@ -10,7 +10,7 @@ let _ = getOpts(process.argv.slice(2), {
 	"-?, -h, --help":                       "",
 	"-m, --mutilate":                       "<bool>",
 	"-u, --underline-urls":                 "<bool>",
-	"-i, -t, --tab, --indent":              "<string|int>",
+	"-i, --indent":                         "<size>",
 	"-c, --colour, --colours, --colourise": "<bool>"
 });
 
@@ -46,11 +46,8 @@ if(options.help){
 let mutilate      = options.m === undefined ? true : bool(options.m);
 let underlineURLs = options.u === undefined ? true : bool(options.u);
 let colourise     = options.c === undefined ? true : bool(options.c);
-let indent        = options.i === undefined ? 4    : options.indent;
-
-/** Indent is a number; treat it as a number of spaces */
-if((+indent) == indent)
-	indent = Array(Math.max(1, indent)+1).join(" ");
+let indentSize    = options.i === undefined ? 4    : options.indent;
+let indent        = Array(Math.max(1, indentSize) + 1).join(" ");
 
 
 
