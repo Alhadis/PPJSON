@@ -54,24 +54,27 @@ let indent        = Array(Math.max(1, indentSize) + 1).join(" ");
 let input = "";
 
 /** An input file was specified on command-line */
-if(argv[0]){
-	fs.access(argv[0], fs.R_OK, error => {
+if(argv.length){
+	
+	/** Cycle through each file and prettify their contents */
+	for(let i = 0, l = argv.length; i < l; ++i){
+		let path = argv[i];
 		
-		/** If there was an access error, hit eject */
-		if(error){
+		try{ fs.accessSync(path); }
+		catch(error){
+			/** If there was an access error, hit eject */
 			process.stderr.write("\x1B[38;5;1m");
 			console.error("\x1B[1mERROR\x1B[22m: " + error.message);
 			process.stderr.write("\x1B[0m");
 			process.exit(2);
 		}
 		
-		
 		/** Otherwise, go for it */
-		fs.readFile(argv[0], {encoding: "utf8"}, (error, data) => {
-			if(error) throw error;
-			prettifyJSON(data);
-		});
-	});
+		prettifyJSON(fs.readFileSync(path, {encoding: "utf8"}));
+		
+		/** Make sure there's enough whitespace between files */
+		if(i < l - 1) process.stdout.write("\n\n");
+	}
 }
 
 /** No file specified, just read from STDIN instead */
