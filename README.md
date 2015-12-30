@@ -67,3 +67,21 @@ Don't remove quote marks from property names:
     ppjson --mutilate nah < file.json
 
 Yes, I really did include `"nah"` as a possible synonym for a false boolean value. Try it.
+
+
+Customising colours
+-------------------
+
+If you'd like to change the colours, you can do so with environment variables.
+Drop the following into your `.bash_profile` or shell equivalent:
+
+    export PPJSON_COLOUR_STRINGS=2
+    export PPJSON_COLOUR_NUMBERS=2
+    export PPJSON_COLOUR_TRUE=6
+    export PPJSON_COLOUR_FALSE=6
+    export PPJSON_COLOUR_NULL=6
+    export PPJSON_COLOUR_PUNCT=8
+    export PPJSON_COLOUR_ERROR=1
+
+The colour defaults are depicted above.
+Each number corresponds to an [ANSI colour index](https://gist.github.com/jasonm23/2868981).

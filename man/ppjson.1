@@ -83,6 +83,24 @@ Don't remove quote marks from property names:
 \fBppjson\fP \-m false file.json
 .br
 \fBppjson\fP \-\-mutilate no < file.json
+.SH ENVIRONMENT
+Colours can be controlled using environment variables.
+Each value maps to an ANSI colour index.
+.PP
+.nf
+.RS
+.I "VARIABLE                 DEFAULT"
+
+.BR "PPJSON_COLOUR_STRINGS       "2
+.BR "PPJSON_COLOUR_NUMBERS       "2
+.BR "PPJSON_COLOUR_TRUE          "6
+.BR "PPJSON_COLOUR_FALSE         "6
+.BR "PPJSON_COLOUR_NULL          "6
+.BR "PPJSON_COLOUR_PUNCT         "8
+.BR "PPJSON_COLOUR_ERROR         "1
+.RE
+.fi
+.PP
 .SH EXIT STATUS
 If a specified filename couldn't be accessed or located, the program exits with an error code of \fB2\fP.
 .SH AUTHOR

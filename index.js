@@ -53,6 +53,16 @@ let alphabetise   = options.a === undefined ? false : options.alphabetise;
 let indent        = Array(Math.max(1, indentSize) + 1).join(" ");
 
 
+/** Configure colour palette */
+let env               = process.env;
+const COLOUR_STRINGS  = "\x1B[38;5;" + (+env.PPJSON_COLOUR_STRINGS || 2) + "m";
+const COLOUR_NUMBERS  = "\x1B[38;5;" + (+env.PPJSON_COLOUR_NUMBERS || 2) + "m";
+const COLOUR_TRUE     = "\x1B[38;5;" + (+env.PPJSON_COLOUR_TRUE    || 6) + "m";
+const COLOUR_FALSE    = "\x1B[38;5;" + (+env.PPJSON_COLOUR_FALSE   || 6) + "m";
+const COLOUR_NULL     = "\x1B[38;5;" + (+env.PPJSON_COLOUR_NULL    || 6) + "m";
+const COLOUR_PUNCT    = "\x1B[38;5;" + (+env.PPJSON_COLOUR_PUNCT   || 8) + "m";
+const COLOUR_ERROR    = "\x1B[38;5;" + (+env.PPJSON_COLOUR_ERROR   || 1) + "m";
+
 
 let input = "";
 
@@ -66,7 +76,7 @@ if(argv.length){
 		try{ fs.accessSync(path); }
 		catch(error){
 			/** If there was an access error, hit eject */
-			process.stderr.write("\x1B[38;5;1m");
+			process.stderr.write(COLOUR_ERROR);
 			console.error("\x1B[1mERROR\x1B[22m: " + error.message);
 			process.stderr.write("\x1B[0m");
 			process.exit(2);
@@ -177,25 +187,21 @@ function prettifyJSON(input){
 	
 	/** Colourise the output */
 	if(colourise){
-		const GREEN = "\x1B[38;5;2m";
 		const RESET = "\x1B[0m";
-		const CYAN  = "\x1B[38;5;6m";
-		const GREY  = "\x1B[38;5;8m";
 		
-		/** Strings */
-		output = output.replace(/("([^\\"]|\\.)*")/g, GREEN+"$1"+RESET);
-		
-		/** Numerals */
-		output = output.replace(/(\d+,)$/gm, GREEN+"$1"+RESET);
-		
-		/** Constants */
-		output = output.replace(/(true|false|null)(,)?$/gm, CYAN+"$1"+RESET+"$2");
-		
-		/** Greyed-out unimportant bits */
 		output = output
-			.replace(new RegExp("^((?:"+indent+")*)([\\[\\{\\}\\]],?)", "gm"), "$1"+GREY+"$2"+RESET)
-			.replace(/((?:\[\]|\{\})?,)$/gm, GREY+"$1"+RESET)
-			.replace(/(\[|\{)$/gm, GREY+"$1"+RESET);
+			.replace(/("([^\\"]|\\.)*")/g, COLOUR_STRINGS + "$1" + RESET)  /** Strings  */
+			.replace(/(\d+,)$/gm,          COLOUR_NUMBERS + "$1" + RESET)  /** Numerals */
+			
+			/** Constants */
+			.replace(/true(,)?$/gm,        COLOUR_TRUE  + "true"  + RESET + "$1")
+			.replace(/false(,)?$/gm,       COLOUR_FALSE + "false" + RESET + "$1")
+			.replace(/null(,)?$/gm,        COLOUR_NULL  + "null"  + RESET + "$1")
+			
+			/** Greyed-out unimportant bits */
+			.replace(new RegExp("^((?:"+indent+")*)([\\[\\{\\}\\]],?)", "gm"), "$1"+COLOUR_PUNCT+"$2"+RESET)
+			.replace(/((?:\[\]|\{\})?,)$/gm, COLOUR_PUNCT+"$1"+RESET)
+			.replace(/(\[|\{)$/gm, COLOUR_PUNCT+"$1"+RESET);
 	}
 	
 
