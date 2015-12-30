@@ -179,6 +179,7 @@ function prettifyJSON(input){
 	if(colourise){
 		const GREEN = "\x1B[38;5;2m";
 		const RESET = "\x1B[0m";
+		const CYAN  = "\x1B[38;5;6m";
 		const GREY  = "\x1B[38;5;8m";
 		
 		/** Strings */
@@ -186,6 +187,9 @@ function prettifyJSON(input){
 		
 		/** Numerals */
 		output = output.replace(/(\d+,)$/gm, GREEN+"$1"+RESET);
+		
+		/** Constants */
+		output = output.replace(/(true|false|null)(,)?$/gm, CYAN+"$1"+RESET+"$2");
 		
 		/** Greyed-out unimportant bits */
 		output = output
