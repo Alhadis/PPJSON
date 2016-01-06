@@ -123,7 +123,7 @@ function bool(input){
 	
 	/** NaN: String was supplied, check for keywords equating to "false" */
 	if(num !== num)
-		return !/^(?:false|off|no|disabled?|nah)$/i.test(input);
+		return !/^(?:false|off|no?|disabled?|nah)$/i.test(input);
 	return !!num;
 }
 
