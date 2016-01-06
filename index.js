@@ -1,8 +1,9 @@
 #!/usr/bin/env node --es_staging
 "use strict";
 
-const getOpts = require("get-options");
-const fs      = require("fs");
+const ChildProcess = require("child_process");
+const getOpts      = require("get-options");
+const fs           = require("fs");
 
 
 /** Read CLI args */
@@ -12,6 +13,7 @@ let _ = getOpts(process.argv.slice(2), {
 	"-u, --underline-urls":                 "<bool>",
 	"-i, --indent":                         "<size>",
 	"-c, --colour, --colours, --colourise": "<bool>",
+	"-p, --paged":                          "",
 	"-a, --alphabetise":                    ""
 });
 
@@ -31,11 +33,12 @@ if(options.help){
 
 	Options:
 
-	  -m, --mutilate <bool>         Unquote property identifiers
-	  -u, --underline-urls <bool>   Add underlines to URLs
-	  -c, --colour <bool>           Colourise the prettified output
-	  -i, --indent <size>           Indentation width, expressed in spaces
+	  -m, --mutilate <bool=1>       Unquote property identifiers
+	  -u, --underline-urls <bool=1> Add underlines to URLs
+	  -c, --colour <bool=1>         Colourise the prettified output
+	  -i, --indent <size=4>         Indentation width, expressed in spaces
 	  -a, --alphabetise             Order properties alphabetically
+	  -p, --paged                   Show content in pager if longer than screen
 
 	Run \`man ppjson' for full documentation.
 	`.replace(/\t+/g, "    ");
@@ -48,6 +51,7 @@ if(options.help){
 let mutilate      = options.m === undefined ? true  : bool(options.m);
 let underlineURLs = options.u === undefined ? true  : bool(options.u);
 let colourise     = options.c === undefined ? true  : bool(options.c);
+let pagedView     = options.p === undefined ? false : bool(options.p);
 let indentSize    = options.i === undefined ? 4     : options.indent;
 let alphabetise   = options.a === undefined ? false : options.alphabetise;
 let indent        = Array(Math.max(1, indentSize) + 1).join(" ");
@@ -64,7 +68,8 @@ const COLOUR_PUNCT    = "\x1B[38;5;" + (+env.PPJSON_COLOUR_PUNCT   || 8) + "m";
 const COLOUR_ERROR    = "\x1B[38;5;" + (+env.PPJSON_COLOUR_ERROR   || 1) + "m";
 
 
-let input = "";
+let input  = "";
+let output = "";
 
 /** An input file was specified on command-line */
 if(argv.length){
@@ -83,11 +88,14 @@ if(argv.length){
 		}
 		
 		/** Otherwise, go for it */
-		prettifyJSON(fs.readFileSync(path, {encoding: "utf8"}));
+		output += prettifyJSON(fs.readFileSync(path, {encoding: "utf8"}));
 		
 		/** Make sure there's enough whitespace between files */
-		if(i < l - 1) process.stdout.write("\n\n");
+		if(i < l - 1) output += "\n\n";
 	}
+	
+	/** Send the compiled result to STDOUT */
+	print(output);
 }
 
 /** No file specified, just read from STDIN instead */
@@ -99,7 +107,7 @@ else{
 		input += chunk;
 	});
 	
-	process.stdin.on("end", e => prettifyJSON(input));
+	process.stdin.on("end", e => print(prettifyJSON(input)));
 }
 
 
@@ -167,6 +175,7 @@ function alphabetiseProperties(input, strictCase){
  * Spruce up JSON for console display.
  *
  * @param {String}
+ * @return {String}
  */
 function prettifyJSON(input){
 	let output = JSON.parse(input);
@@ -213,5 +222,29 @@ function prettifyJSON(input){
 		output   = output.replace(rURL, UNDERLINE_ON+"$1"+UNDERLINE_OFF);
 	}
 	
-	process.stdout.write(output + "\n");
+	return output + "\n";
+}
+
+
+
+/**
+ * Send a string to STDOUT.
+ *
+ * The content is sent through to the less program if it's too long to
+ * show without scrolling, unless the --paged option's been disabled.
+ *
+ * @param {String} input
+ */
+function print(input){
+	
+	/** Determine if the output should be piped through to a pager */
+	if(pagedView && input.match(/\n/g).length > process.stdout.rows){
+		let less  = ChildProcess.spawn("less", ["-Ri"], {
+			stdio: ["pipe", process.stdout, process.stderr]
+		});
+		less.stdin.write(input);
+		less.stdin.end();
+	}
+
+	else process.stdout.write(input);
 }
