@@ -31,6 +31,7 @@ Options
 -c, --colour             [bool]     Colourises the prettified output
 -i, --indent             [size]     Indentation width, expressed in spaces. Default: 4
 -a, --alphabetise                   Order properties alphabetically
+-p, --paged                         Show content in pager if too long to fit in screen
 ```
 
 The `[bool]` options above are all enabled by default.
