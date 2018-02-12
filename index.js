@@ -14,7 +14,9 @@ const {options, argv} = getOpts(process.argv.slice(2), {
 	"-i, --indent":                         "<size>",
 	"-c, --colour, --colours, --colourise": "<bool>",
 	"-p, --paged":                          "",
-	"-a, --alphabetise":                    ""
+	"-a, --alphabetise":                    "",
+	"-t, --tabs":                           "",
+	"-w, --write":                          "",
 });
 
 
@@ -35,6 +37,8 @@ if(options.help){
 	  -i, --indent <size=4>         Indentation width, expressed in spaces
 	  -a, --alphabetise             Order properties alphabetically
 	  -p, --paged                   Show content in pager if longer than screen
+	  -t, --tabs                    Use tabs to indent output instead of spaces
+	  -w, --write                   Write prettified data back to files
 
 	Run \`man ppjson' for full documentation.
 	`.replace(/\t+/g, "    ");
@@ -52,7 +56,9 @@ const colourise     = undefined === options.c ? isTTY : bool(options.c);
 const pagedView     = undefined === options.p ? false : bool(options.p);
 const indentSize    = undefined === options.i ? 4     : options.indent;
 const alphabetise   = undefined === options.a ? false : options.alphabetise;
-const indent        = Array(Math.max(1, indentSize) + 1).join(" ");
+const writeBack     = undefined === options.w ? false : bool(options.w);
+const tabs          = undefined === options.t ? false : bool(options.t);
+const indent        = tabs? "\t" : Array(Math.max(1, indentSize) + 1).join(" ");
 
 
 // Configure colour palette
@@ -85,12 +91,17 @@ if(argv.length){
 	// Cycle through each file and prettify their contents
 	for(const path of argv){
 		
-		// Make sure there'	s enough whitespace between files
+		// Make sure there's enough whitespace between files
 		output += separator;
 		separator = "\n\n";
 		
 		try{
-			const fileData = fs.readFileSync(path, {encoding: "utf8"});
+			let fileData = fs.readFileSync(path, {encoding: "utf8"});
+			if(writeBack){
+				fileData = parseJSON(fileData);
+				fs.writeFileSync(path, JSON.stringify(fileData, null, indent));
+				continue;
+			}
 			output += prettifyJSON(fileData);
 		}
 		// If there was an access error, hit eject
@@ -112,6 +123,13 @@ if(argv.length){
 
 // No file specified, just read from STDIN instead
 else{
+	if(writeBack){
+		let msg = "Ignoring --write switch: reading from STDIN.";
+		if(process.stderr.isTTY)
+			msg = SGR.colours.error + msg + SGR.reset;
+		process.stderr.write(msg + "\n");
+	}
+
 	process.stdin.setEncoding("utf8");
 	process.stdin.on("readable", () => {
 		const chunk = process.stdin.read();
@@ -195,7 +213,8 @@ function parseJSON(input = ""){
 		.replace(/;$|^\s*"use strict"\s*(?:;\s*)?$/g, "")
 		.replace(/^(module\s*\.\s*)?exports\s*=\s*/g, "")
 		.replace(/^export(\s+default)?\s*/, "");
-	return require("vm").runInNewContext(`(${input})`);
+	const output = require("vm").runInNewContext(`(${input})`);
+	return alphabetise ? alphabetiseProperties(output) : output;
 }
 
 
@@ -206,21 +225,13 @@ function parseJSON(input = ""){
  * @return {String}
  */
 function prettifyJSON(input){
-	let output = parseJSON(input);
-	
-	// Order the properties of objects by alphabetical order, not enumeration order
-	if(alphabetise)
-		output = alphabetiseProperties(output);
-	
-	output = JSON.stringify(output, null, indent);
-	
+	let output = JSON.stringify(parseJSON(input), null, indent);
 	
 	// Unquote property identifiers in object literals
 	if(mutilate){
 		const pattern = new RegExp(indent + '"([\\w\\$]+)":', "g");
 		output = output.replace(pattern, indent + "$1:");
 	}
-	
 	
 	// Colourise the output
 	if(colourise){
