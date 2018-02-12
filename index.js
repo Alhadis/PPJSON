@@ -265,8 +265,9 @@ function prettifyJSON(input){
 
 	// Underline URLs
 	if(underlineURLs){
-		const rURL = /(\s*(https?:)?\/\/([^:]+:[^@]+@)?([\w-]+)(\.[\w-]+)*(:\d+)?(\/\S+)?\s*(?="))/gm;
+		const rURL = /(\s*((git\+)?[-a-z]+:|mailto:)?\/\/([^:\/]+:[^@\/]+@)?([\w-]+)(\.[\w-]+)*(:\d+)?(\/?[^\/\s\)"'`]+)*\/?)/gm;
 		output = output.replace(rURL, SGR.underline + "$1" + SGR.noUnderline);
+		output = output.replace(/[-\w.+]+@(?:[-\w.+]+\.)+[-\w.]*/g, SGR.underline + "$&" + SGR.noUnderline);
 	}
 	
 	return output + "\n";
