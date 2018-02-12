@@ -1,4 +1,4 @@
-#!/usr/bin/env node --es_staging
+#!/usr/bin/env node
 "use strict";
 
 const ChildProcess = require("child_process");
