@@ -13,7 +13,7 @@ const {options, argv} = getOpts(process.argv.slice(2), {
 	"-u, --underline-urls":                 "<bool>",
 	"-i, --indent":                         "<size>",
 	"-c, --colour, --colours, --colourise": "<bool>",
-	"-p, --paged":                          "",
+	"-p, --paged, --pager":                 "<bool>",
 	"-a, --alphabetise":                    "",
 	"-t, --tabs":                           "",
 	"-w, --write":                          "",
@@ -36,7 +36,7 @@ if(options.help){
 	  -c, --colour <bool=1>         Colourise the prettified output
 	  -i, --indent <size=4>         Indentation width, expressed in spaces
 	  -a, --alphabetise             Order properties alphabetically
-	  -p, --paged                   Show content in pager if longer than screen
+	  -p, --paged <bool=1>          Show content in pager if longer than screen
 	  -t, --tabs                    Use tabs to indent output instead of spaces
 	  -w, --write                   Write prettified data back to files
 
@@ -53,7 +53,7 @@ const isTTY         = !!process.stdout.isTTY;
 const mutilate      = undefined === options.m ? true  : bool(options.m);
 const underlineURLs = undefined === options.u ? isTTY : bool(options.u);
 const colourise     = undefined === options.c ? isTTY : bool(options.c);
-const pagedView     = undefined === options.p ? false : bool(options.p);
+const pagedView     = undefined === options.p ? true  : bool(options.p);
 const indentSize    = undefined === options.i ? 4     : options.indent;
 const alphabetise   = undefined === options.a ? false : options.alphabetise;
 const writeBack     = undefined === options.w ? false : bool(options.w);
