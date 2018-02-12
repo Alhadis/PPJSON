@@ -91,6 +91,12 @@ const SGR = {
 };
 
 
+// Bail if an unrecognised option was passed
+const unknownOption = argv.find(opt => /^-/.test(opt));
+if(unknownOption)
+	die(`Unknown option: ${unknownOption}`);
+
+
 let input  = "";
 let output = "";
 
@@ -116,14 +122,7 @@ if(argv.length){
 		}
 		// If there was an access error, hit eject
 		catch(error){
-			const msg = ": " + error.message + "\n";
-			if(process.stderr.isTTY){
-				process.stderr.write(SGR.colours.error);
-				process.stderr.write(SGR.bold + "ERROR" + SGR.unbold + msg);
-				process.stderr.write(SGR.reset);
-			}
-			else process.stderr.write("ERROR" + msg);
-			process.exit(2);
+			die(error.message, 2);
 		}
 	}
 	
@@ -273,6 +272,23 @@ function prettifyJSON(input){
 	return output + "\n";
 }
 
+
+/**
+ * Terminate with an angry red error message.
+ *
+ * @param {String} text - Error message
+ * @param {Number} code - Exit status
+ */
+function die(text, code = 1){
+	const msg = `: ${text}\n`;
+	if(process.stderr.isTTY){
+		process.stderr.write(SGR.colours.error);
+		process.stderr.write(SGR.bold + "ERROR" + SGR.unbold + msg);
+		process.stderr.write(SGR.reset);
+	}
+	else process.stderr.write("ERROR" + msg);
+	process.exit(code);
+}
 
 
 /**
