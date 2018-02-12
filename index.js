@@ -43,10 +43,12 @@ if(options.help){
 	process.exit(0);
 }
 
+
 // Parse our options and normalise their defaults
+const isTTY         = !!process.stdout.isTTY;
 const mutilate      = undefined === options.m ? true  : bool(options.m);
-const underlineURLs = undefined === options.u ? true  : bool(options.u);
-const colourise     = undefined === options.c ? true  : bool(options.c);
+const underlineURLs = undefined === options.u ? isTTY : bool(options.u);
+const colourise     = undefined === options.c ? isTTY : bool(options.c);
 const pagedView     = undefined === options.p ? false : bool(options.p);
 const indentSize    = undefined === options.i ? 4     : options.indent;
 const alphabetise   = undefined === options.a ? false : options.alphabetise;
@@ -64,7 +66,7 @@ const SGR = {
 	colours: {
 		strings: `\x1B[38;5;${ +env.PPJSON_COLOUR_STRINGS || 2 }m`,
 		numbers: `\x1B[38;5;${ +env.PPJSON_COLOUR_NUMBERS || 2 }m`,
-		true:    `\x1B[38;5;${ +env.PPJSON_COLOUR_TRUE    || 6 }m`,	
+		true:    `\x1B[38;5;${ +env.PPJSON_COLOUR_TRUE    || 6 }m`,
 		false:   `\x1B[38;5;${ +env.PPJSON_COLOUR_FALSE   || 6 }m`,
 		null:    `\x1B[38;5;${ +env.PPJSON_COLOUR_NULL    || 6 }m`,
 		punct:   `\x1B[38;5;${ +env.PPJSON_COLOUR_PUNCT   || 8 }m`,
@@ -86,18 +88,22 @@ if(argv.length){
 		// Make sure there'	s enough whitespace between files
 		output += separator;
 		separator = "\n\n";
-
-		try{ fs.accessSync(path); }
+		
+		try{
+			const fileData = fs.readFileSync(path, {encoding: "utf8"});
+			output += prettifyJSON(fileData);
+		}
+		// If there was an access error, hit eject
 		catch(error){
-			// If there was an access error, hit eject
-			process.stderr.write(SGR.colours.error);
-			process.stderr.write(SGR.bold + "ERROR" + SGR.unbold + error.message);
-			process.stderr.write(SGR.reset);
+			const msg = ": " + error.message + "\n";
+			if(process.stderr.isTTY){
+				process.stderr.write(SGR.colours.error);
+				process.stderr.write(SGR.bold + "ERROR" + SGR.unbold + msg);
+				process.stderr.write(SGR.reset);
+			}
+			else process.stderr.write("ERROR" + msg);
 			process.exit(2);
 		}
-		
-		// Otherwise, go for it
-		output += prettifyJSON(fs.readFileSync(path, {encoding: "utf8"}));
 	}
 	
 	// Send the compiled result to STDOUT
