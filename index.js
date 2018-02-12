@@ -177,6 +177,21 @@ function alphabetiseProperties(input, strictCase = false){
 }
 
 
+/**
+ * Parse JSON or JSON-like data.
+ *
+ * @param {String}
+ * @return {Object}
+ */
+function parseJSON(input = ""){
+	if(!input) return undefined;
+	input = input.trim()
+		.replace(/;$|^\s*"use strict"\s*(?:;\s*)?$/g, "")
+		.replace(/^(module\s*\.\s*)?exports\s*=\s*/g, "")
+		.replace(/^export(\s+default)?\s*/, "");
+	return require("vm").runInNewContext(`(${input})`);
+}
+
 
 /**
  * Spruce up JSON for console display.
@@ -185,7 +200,7 @@ function alphabetiseProperties(input, strictCase = false){
  * @return {String}
  */
 function prettifyJSON(input){
-	let output = JSON.parse(input);
+	let output = parseJSON(input);
 	
 	// Order the properties of objects by alphabetical order, not enumeration order
 	if(alphabetise)
