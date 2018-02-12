@@ -259,7 +259,8 @@ function prettifyJSON(input){
 			// Greyed-out unimportant bits
 			.replace(bracketsPattern, "$1" + colours.punct + "$2" + SGR.reset)
 			.replace(/((?:\[\]|\{\})?,)$/gm, colours.punct + "$1" + SGR.reset)
-			.replace(/(\[|\{)$/gm,           colours.punct + "$1" + SGR.reset);
+			.replace(/(\[|\{)$/gm,           colours.punct + "$1" + SGR.reset)
+			.replace(/(\[\]$|{})$/gm,        colours.punct + "$1" + SGR.reset);
 	}
 	
 
@@ -301,6 +302,9 @@ function die(text, code = 1){
  * @param {String} input
  */
 function print(input){
+
+	// Do nothing if write-back mode is enabled
+	if(writeBack) return;
 	
 	// Determine if the output should be piped through to a pager
 	if(pagedView && input.match(/\n/g).length > process.stdout.rows){
