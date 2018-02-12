@@ -9,13 +9,14 @@ const fs           = require("fs");
 // Read CLI args
 const {options, argv} = getOpts(process.argv.slice(2), {
 	"-?, -h, --help":                       "",
-	"-m, --mutilate":                       "<bool>",
-	"-u, --underline-urls":                 "<bool>",
-	"-i, --indent":                         "<size>",
-	"-c, --colour, --colours, --colourise": "<bool>",
-	"-p, --paged, --pager":                 "<bool>",
 	"-a, --alphabetise":                    "",
+	"-c, --colour, --colours, --colourise": "<bool>",
+	"-i, --indent":                         "<size>",
+	"-m, --mutilate":                       "<bool>",
+	"-p, --paged, --pager":                 "<bool>",
 	"-t, --tabs":                           "",
+	"-u, --underline-urls":                 "<bool>",
+	"-v, --version":                        "",
 	"-w, --write":                          "",
 });
 
@@ -31,19 +32,28 @@ if(options.help){
 
 	Options:
 
-	  -m, --mutilate <bool=1>       Unquote property identifiers
-	  -u, --underline-urls <bool=1> Add underlines to URLs
+	  -a, --alphabetise             Order properties alphabetically
 	  -c, --colour <bool=1>         Colourise the prettified output
 	  -i, --indent <size=4>         Indentation width, expressed in spaces
-	  -a, --alphabetise             Order properties alphabetically
+	  -m, --mutilate <bool=1>       Unquote property identifiers
 	  -p, --paged <bool=1>          Show content in pager if longer than screen
 	  -t, --tabs                    Use tabs to indent output instead of spaces
+	  -u, --underline-urls <bool=1> Add underlines to URLs
+	  -v, --version                 Print the program's version string and exit
 	  -w, --write                   Write prettified data back to files
 
 	Run \`man ppjson' for full documentation.
 	`.replace(/\t+/g, "    ");
 
 	process.stdout.write(help + "\n");
+	process.exit(0);
+}
+
+
+// Print the program's version string if requested
+if(options.version){
+	const {version} = require("./package.json");
+	process.stdout.write(version.replace(/^v?/, "v") + "\n");
 	process.exit(0);
 }
 
