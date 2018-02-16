@@ -245,22 +245,26 @@ function prettifyJSON(input){
 	// Colourise the output
 	if(colourise){
 		const bracketsPattern = new RegExp("^((?:" + indent + ")*)([\\[\\{\\}\\]],?)", "gm");
+		const colonSepPattern = /^(\s*(?:"[^\"]+"|\w+))(:)/gm;
 		const {colours, reset} = SGR;
 		const {strings} = colours;
 		output = output
-			.replace(/("([^\\"]|\\.)*")/g, colours.strings + "$1" + SGR.reset)  // Strings
-			.replace(/(\d+,)$/gm,          colours.numbers + "$1" + SGR.reset)  // Numerals
-			
+
 			// Constants
 			.replace(/true(,)?$/gm,        colours.true  + "true"  + SGR.reset + "$1")
 			.replace(/false(,)?$/gm,       colours.false + "false" + SGR.reset + "$1")
 			.replace(/null(,)?$/gm,        colours.null  + "null"  + SGR.reset + "$1")
-			
+
 			// Greyed-out unimportant bits
 			.replace(bracketsPattern, "$1" + colours.punct + "$2" + SGR.reset)
+			.replace(colonSepPattern, "$1" + colours.punct + "$2" + SGR.reset)
 			.replace(/((?:\[\]|\{\})?,)$/gm, colours.punct + "$1" + SGR.reset)
 			.replace(/(\[|\{)$/gm,           colours.punct + "$1" + SGR.reset)
-			.replace(/(\[\]$|{})$/gm,        colours.punct + "$1" + SGR.reset);
+			.replace(/(\[\]$|{})$/gm,        colours.punct + "$1" + SGR.reset)
+
+			// Strings and numerals
+			.replace(/("([^\\"]|\\.)*")/g, colours.strings + "$1" + SGR.reset)
+			.replace(/(\d+,)$/gm,          colours.numbers + "$1" + SGR.reset);
 	}
 	
 
