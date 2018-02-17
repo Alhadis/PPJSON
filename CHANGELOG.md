@@ -8,6 +8,7 @@ This project honours [Semantic Versioning](http://semver.org/).
 ------------------------------------------------------------------------
 * **Added:** This change-log
 * **Added:** Improved handling of unrecognised options
+* **Added:** Improved default palette for limited-colour environments
 * **Added:** Shading to empty bracket-pairs and key-value separators
 * **Added:** Support for customising colours using `PPJSON_COLOURS`
 * **Added:** Support for underlining e-mail addresses

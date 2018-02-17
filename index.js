@@ -79,42 +79,8 @@ const SGR = {
 	unbold:      "\x1B[22m",
 	underline:   "\x1B[4m",
 	noUnderline: "\x1B[24m",
-	colours: {
-		strings: `\x1B[38;5;${ +env.PPJSON_COLOUR_STRINGS || 2 }m`,
-		numbers: `\x1B[38;5;${ +env.PPJSON_COLOUR_NUMBERS || 2 }m`,
-		true:    `\x1B[38;5;${ +env.PPJSON_COLOUR_TRUE    || 6 }m`,
-		false:   `\x1B[38;5;${ +env.PPJSON_COLOUR_FALSE   || 6 }m`,
-		null:    `\x1B[38;5;${ +env.PPJSON_COLOUR_NULL    || 6 }m`,
-		punct:   `\x1B[38;5;${ +env.PPJSON_COLOUR_PUNCT   || 8 }m`,
-		error:   `\x1B[38;5;${ +env.PPJSON_COLOUR_ERROR   || 1 }m`,
-		unquoted: "",
-	},
+	colours: resolveColours(),
 };
-
-// Allow colours to be customised using a `GREP_COLORS`-style variable
-if(env.PPJSON_COLOURS){
-	// Map single-character fields to entries in the SGR.colours object
-	const keyMap = {
-		s: "strings",
-		n: "numbers",
-		t: "true",
-		f: "false",
-		n: "null",
-		p: "punct",
-		e: "error",
-		u: "unquoted",
-	};
-	const fields = env.PPJSON_COLOURS.replace(/\s+/, "").split(":").filter(Boolean);
-	for(const field of fields){
-		let [key, ...value] = field.split("=");
-		key = key.toLowerCase();
-		if(key in keyMap){
-			key   = keyMap[key];
-			value = value.join("=");
-			SGR.colours[key] = `\x1B[${value}m`;
-		}
-	}
-}
 
 
 // Bail if an unrecognised option was passed
@@ -309,6 +275,69 @@ function prettifyJSON(input){
 	
 	return output + "\n";
 }
+
+
+/**
+ * Determine which colour palette to use.
+ *
+ * Results are determined based on environment variables and platform
+ * support. Note that the latter is extremely limited on purpose: one
+ * can easily disable or override colours on command-line if need be.
+ *
+ * @return {Object}
+ */
+function resolveColours(){
+	const isLtd = "win32" === process.platform || /^vt|^dumb$/.test(process.env.TERM);
+
+	let unquoted = "";
+	let strings = isLtd ? "32" : "38;5;2"; // Green
+	let numbers = isLtd ? "32" : "38;5;2"; // Green
+	let True    = isLtd ? "36" : "38;5;6"; // Cyan
+	let False   = isLtd ? "36" : "38;5;6"; // Cyan
+	let Null    = isLtd ? "36" : "38;5;6"; // Cyan
+	let punct   = isLtd ? "37" : "38;5;8"; // Grey
+	let error   = isLtd ? "31" : "38;5;1"; // Red
+	
+	// Check the older (clumsier) environment variables first
+	strings = +env.PPJSON_COLOUR_STRINGS || strings;
+	numbers = +env.PPJSON_COLOUR_NUMBERS || numbers;
+	True    = +env.PPJSON_COLOUR_TRUE    || True;
+	False   = +env.PPJSON_COLOUR_FALSE   || False;
+	Null    = +env.PPJSON_COLOUR_NULL    || Null;
+	punct   = +env.PPJSON_COLOUR_PUNCT   || punct;
+	error   = +env.PPJSON_COLOUR_ERROR   || error;
+
+	// Allow colours to be customised using a `GREP_COLORS`-style variable
+	if(env.PPJSON_COLOURS){
+		const fields = env.PPJSON_COLOURS.replace(/\s+/, "").split(":").filter(Boolean);
+		for(const field of fields){
+			let [key, ...value] = field.split("=");
+			value = `\x1B[${ value.join("=") }m`;
+			switch(key.toLowerCase()){
+				case "s": strings  = value; break;
+				case "n": numbers  = value; break;
+				case "t": True     = value; break;
+				case "f": False    = value; break;
+				case "n": Null     = value; break;
+				case "p": punct    = value; break;
+				case "e": error    = value; break;
+				case "u": unquoted = value; break;
+			}
+		}
+	}
+
+	return {
+		strings:  strings  ? `\x1B[${ strings  }m` : "",
+		numbers:  numbers  ? `\x1B[${ numbers  }m` : "",
+		true:     True     ? `\x1B[${ True     }m` : "",
+		false:    False    ? `\x1B[${ False    }m` : "",
+		null:     Null     ? `\x1B[${ Null     }m` : "",
+		punct:    punct    ? `\x1B[${ punct    }m` : "",
+		error:    error    ? `\x1B[${ error    }m` : "",
+		unquoted: unquoted ? `\x1B[${ unquoted }m` : "",
+	};
+}
+
 
 
 /**
