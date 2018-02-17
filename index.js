@@ -87,8 +87,34 @@ const SGR = {
 		null:    `\x1B[38;5;${ +env.PPJSON_COLOUR_NULL    || 6 }m`,
 		punct:   `\x1B[38;5;${ +env.PPJSON_COLOUR_PUNCT   || 8 }m`,
 		error:   `\x1B[38;5;${ +env.PPJSON_COLOUR_ERROR   || 1 }m`,
+		unquoted: "",
 	},
 };
+
+// Allow colours to be customised using a `GREP_COLORS`-style variable
+if(env.PPJSON_COLOURS){
+	// Map single-character fields to entries in the SGR.colours object
+	const keyMap = {
+		s: "strings",
+		n: "numbers",
+		t: "true",
+		f: "false",
+		n: "null",
+		p: "punct",
+		e: "error",
+		u: "unquoted",
+	};
+	const fields = env.PPJSON_COLOURS.replace(/\s+/, "").split(":").filter(Boolean);
+	for(const field of fields){
+		let [key, ...value] = field.split("=");
+		key = key.toLowerCase();
+		if(key in keyMap){
+			key   = keyMap[key];
+			value = value.join("=");
+			SGR.colours[key] = `\x1B[${value}m`;
+		}
+	}
+}
 
 
 // Bail if an unrecognised option was passed
@@ -265,6 +291,12 @@ function prettifyJSON(input){
 			// Strings and numerals
 			.replace(/("([^\\"]|\\.)*")/g, colours.strings + "$1" + SGR.reset)
 			.replace(/(\d+,)$/gm,          colours.numbers + "$1" + SGR.reset);
+
+		// Unquoted property key styling (blank by default)
+		if(colours.unquoted){
+			const str = "$1" + colours.unquoted + "$2" + SGR.reset;
+			output = output.replace(/(^\s*)(\w+)/gm, str);
+		}
 	}
 	
 

@@ -9,6 +9,7 @@ This project honours [Semantic Versioning](http://semver.org/).
 * **Added:** This change-log
 * **Added:** Improved handling of unrecognised options
 * **Added:** Shading to empty bracket-pairs and key-value separators
+* **Added:** Support for customising colours using `PPJSON_COLOURS`
 * **Added:** Support for underlining e-mail addresses
 * **Added:** Support for `--version` switch
 * **Added:** Support for writing prettified source back to source files
