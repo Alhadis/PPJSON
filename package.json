@@ -1,6 +1,6 @@
 {
 	"name":         "ppjson",
-	"version":      "1.3.0",
+	"version":      "v1.4.0",
 	"author":       "John Gardner <gardnerjohng@gmail.com>",
 	"description":  "Small command-line utility to pretty-print JSON files. Colour included.",
 	"keywords":     ["pretty-print", "JSON", "pretty print", "beautify", "terminal", "CLI", "command-line"],

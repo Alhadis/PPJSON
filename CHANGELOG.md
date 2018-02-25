@@ -4,8 +4,9 @@ Change-log
 This project honours [Semantic Versioning](http://semver.org/).
 
 
-[Unpublished]
+[v1.4.0]
 ------------------------------------------------------------------------
+**February 25th, 2018**  
 * **Added:** This change-log
 * **Added:** Improved handling of unrecognised options
 * **Added:** Improved default palette for limited-colour environments
@@ -49,7 +50,8 @@ Initial release.
 
 
 [Referenced links]:_____________________________________________________
-[Unpublished]: ../../compare/v1.3.0...HEAD
+[Unpublished]: ../../compare/v1.4.0...HEAD
+[v1.4.0]: https://github.com/Alhadis/PPJSON/releases/tag/v1.4.0
 [v1.3.0]: https://github.com/Alhadis/PPJSON/releases/tag/v1.3.0
 [v1.2.0]: https://github.com/Alhadis/PPJSON/releases/tag/v1.2.0
 [v1.1.0]: https://github.com/Alhadis/PPJSON/releases/tag/v1.1.0
