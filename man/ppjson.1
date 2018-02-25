@@ -1,111 +1,193 @@
-.TH PPJSON 1 "2016-01-07" "PPJSON v1.3.0" "JSON Pretty Printer"
+.TH PPJSON 1 "2018-02-25" "PPJSON v1.4.0" "JSON Pretty Printer"
 .\"
 .\"       It's hand-written, baby
 .\"
-.nh   .\" Disable hyphenation
-.ad l .\" Disable justification: left-align only
+.nh    \" Disable hyphenation
+.ad l  \" Disable justification: left-align only
+.
+.ds -  \N'45'
+.ds -- \*-\*-
+.
+.de EX
+.	PP
+.	nf
+.	RS
+..
+.de EE
+.	RE
+.	fi
+..
+.\" ======================================================
 .SH NAME
-\fBppjson\fP \-\- Pretty\-print JSON data for terminal output
+.ds Nm \fBppjson\fP
+\*(Nm \(em pretty-print JSON data for terminal display
+.
 .SH SYNOPSIS
-\fBppjson\fP [\fIoptions\fP] \fIfilename\fP
+.B ppjson
+.RI [ options ]
+.I filename
+.
+.\" ======================================================
 .SH DESCRIPTION
-Pretty\-print and colourise JSON data for terminal display.
+Pretty-print and colourise JSON data for terminal display.
 .PP
 JSON data can be supplied by \fIfilename\fP, or piped through standard input:
+.
+.EX
+\*(Nm json.file
+\*(Nm < json.file
+\fBnode\fP generate-and-echo-json.js | \*(Nm
+.EE
+.
 .PP
-.nf
-.RS
-\fBppjson\fP json.file
-\fBppjson\fP < json.file
-\fBnode\fP generate-and-echo-json.js | ppjson
-.RE
-.fi
+Since v1.4.0, the program also accepts JSON-like data as well:
+.EX
+\fBnpm\fP show mocha | ppjson
+\fBecho\fP "{unquoted: 'string'}" | \*(Nm
+.EE
+.
+.\" ======================================================
 .SH OPTIONS
 Each boolean option mentioned below is enabled by default.
-.IP "\fB\-m\fP \fIBOOL\fP, \fB\-\-mutilate\fP=\fIBOOL\fP"
+.
+.IP "\fB\*-m\fP \fIBOOL\fP, \fB\*(--mutilate\fP=\fIBOOL\fP
 Unquote property identifiers in object literals:
+.EX
+\&       { "okay" : true }  # Before
+\&    \fB\->\fP {  okay  : true }  # After
+.sp
+Unsafe property identifiers are left untouched:
+.sp
+\&       { "o.k?" : false }  # Before AND after
+.EE
+.
+.IP "\fB\*-u\fP \fIBOOL\fP, \fB\*(--underline\*-urls\fP=\fIBOOL\fP
+Decorate URLs and email addresses with underlines.
+.
+.IP "\fB\*-c\fP \fIBOOL\fP, \fB\*(--colour\fP=\fIBOOL\fP, \fB\*(--colours\fP=\fIBOOL\fP, \fB\*(--colourise\fP=\fIBOOL\fP
+Colourise the formatted output, which is the default unless output is not to a terminal.
+.
+.IP "\fB\*-i\fP \fIWIDTH\fP, \fB\*(--indent\fP=\fIWIDTH\fP
+Set the width of each indentation level, expressed in spaces.
+.
+.IP "\fB\*-a\fP, \fB\*(--alphabetise\fP
+Order the properties of each object alphabetically.
+.
+.IP "\fB\*-p\fP, \fB\*(--paged\fP=\fIBOOL\fP
+Display output using \fB`less -Ri`\fP if it's too long to fit in one window.
+.
+.IP "\fB\*-t\fP, \fB\*(--tabs\fP=\fIBOOL\fP
+Use tabs for indenting output instead of spaces.
+.
+.IP "\fB\*-w\fP, \fB\*(--write\fP
+Don't actually display the output, but simply write it back to the source file.
+.
+.IP "\fB\*-?\fP, \fB\*-h\fP, \fB\*(--help\fP
+Display a brief help summary and exit.
+.
+.IP "\fB\*-v\fP, \fB\*(--version\fP
+Print the program's version string and exit.
+.
+.\" ======================================================
+.SH BOOLEAN OPTIONS
+The \fIBOOL\fP options described above are all enabled by default.
+Disable them by passing \fB0\fP, \fBfalse\fP, \fBno\fP or \fBoff\fP \(em their capitalisation doesn't matter.
+.EX
+# All these lines are equivalent
+\*(Nm \*(--mutilate=no
+\*(Nm \*(--mutilate OFF
+\*(Nm \*(--mutilate 0
+\*(Nm  \*-m0
+\*(Nm \*(--mutilate false
+.EE
+.PP
+Option order is inconsequential; they may be listed before or after a filename:
+.
+.EX
+# Same damn thing
+\*(Nm \*-m0 file.json
+\*(Nm file.json \*-m0
+.EE
+.
+.\" ======================================================
+.SH ENVIRONMENT
+.TP
+\fBPAGER\fP
+Name of a program to call to display lengthy output.
+If not set, \fB`less -Ri`\fP is used.
+.
+.TP
+\fBPPJSON_COLOURS\fP
+A list of SGR codes that override the default colour styles.
+Its syntax is similar to that used by GNU
+.BR grep (1)'s
+.B GREP_COLORS
+variable.
+.RS
+.sp
+Default values are:
+.RS
+.sp
+\fBPPJSON_COLOURS\fP='s=38;5;2:n=38;5;2:t=38;5;6:f=38;5;6:n=38;5;6:p=38;5;8:e=38;5;1;u='
+.RE
+.sp 2
+With each key corresponding to a different part of JSON that can be stylised:
+.sp 2
+.RS
+.sp 2
+.nf
+.BR s " = Strings
+.BR n " = Numbers
+.BR t " = True
+.BR f " = False
+.BR n " = Null
+.BR p " = Punctuation (colons and brackets)
+.BR e " = Error highlighting
+.BR u " = Unquoted property keys
+.fi
+.RE
+.
+.sp 2
+The \fBPPJSON_COLOURS\fP variable replaces an unwieldier format used by older versions of \*(Nm:
 .PP
 .nf
 .RS
-       { "okay" : true }  # Before
-    \fB\->\fP {  okay  : true }  # After
-    
-Unsafe property identifiers are left untouched:
-    
-       { "o.k?" : false }  # Before AND after
+.BR PPJSON_COLOUR_STRINGS =2
+.BR PPJSON_COLOUR_NUMBERS =2
+.BR PPJSON_COLOUR_TRUE =6
+.BR PPJSON_COLOUR_FALSE =6
+.BR PPJSON_COLOUR_NULL =6
+.BR PPJSON_COLOUR_PUNCT =8
+.BR PPJSON_COLOUR_ERROR =1
 .RE
 .fi
-.IP "\fB\-u\fP \fIBOOL\fP, \fB\-\-underline\-urls\fP=\fIBOOL\fP"
-Decorate URL patterns with underlines.
-.IP "\fB\-c\fP \fIBOOL\fP, \fB\-\-colour\fP=\fIBOOL\fP, \fB\-\-colours\fP=\fIBOOL\fP, \fB\-\-colourise\fP=\fIBOOL\fP"
-Colourise the beautified output. Turning this off disables colours.
-.IP "\fB\-i\fP \fIWIDTH\fP, \fB\-\-indent\fP=\fIWIDTH\fP"
-Set the width of each indentation level, expressed in spaces.
-.IP "\fB\-a\fP, \fB\-\-alphabetise\fP"
-Order the properties of objects by alphabetic order, not the order in which they were enumerated (the default).
-This option is \fIoff\fP by default.
-.IP "\fB\-p\fP, \fB\-\-paged\fP"
-Display output using \fB`less -Ri`\fP if it's too long to fit in one window. This option is \fIoff\fP by default.
-.IP "\fB\-?\fP, \fB\-h\fP, \fB\-\-help\fP"
-Display a brief help summary and exit.
-.SH PASSING OPTIONS
-The \fIBOOL\fP options described above are all enabled by default.
-You can disable them by passing \fB0\fP, \fBfalse\fP, \fBno\fP or \fBoff\fP as values (their capitalisation doesn't matter):
-.nf
-.RS
-    
-# All these lines are equivalent
-\fBppjson\fP \-\-mutilate=no
-\fBppjson\fP \-\-mutilate OFF
-\fBppjson\fP \-\-mutilate 0
-\fBppjson\fP  \-m0
-\fBppjson\fP \-\-mutilate false
-    
-.RE
-.fi
-Option order is inconsequential; they may be listed before or after a filename:
-.nf
-.RS
-    
-# Same damn thing
-\fBppjson\fP \-m0 file.json
-\fBppjson\fP file.json \-m0
-    
-.RE
-.fi
+.PP
+This older format is deprecated and its use is discouraged.
+Support may be removed in a future release.
+.
+.\" ======================================================
 .SH EXAMPLES
 .TP
 Use 2 spaces instead of 4:
-\fBppjson\fP \-\-indent=2 file.json
+\*(Nm \*(--indent=2 file.json
 .TP
 Disable colours:
-\fBppjson\fP \-c0 < file.json
+\*(Nm \*-c0 < file.json
 .TP
 Don't remove quote marks from property names:
-\fBppjson\fP \-m false file.json
+\*(Nm \*-m false file.json
 .br
-\fBppjson\fP \-\-mutilate no < file.json
-.SH ENVIRONMENT
-Colours can be controlled using environment variables.
-Each value maps to an ANSI colour index.
-.PP
-.nf
-.RS
-.I "VARIABLE                 DEFAULT"
-
-.BR "PPJSON_COLOUR_STRINGS       "2
-.BR "PPJSON_COLOUR_NUMBERS       "2
-.BR "PPJSON_COLOUR_TRUE          "6
-.BR "PPJSON_COLOUR_FALSE         "6
-.BR "PPJSON_COLOUR_NULL          "6
-.BR "PPJSON_COLOUR_PUNCT         "8
-.BR "PPJSON_COLOUR_ERROR         "1
-.RE
-.fi
-.PP
+\*(Nm \*(--mutilate no < file.json
+.TP
+Reformat a list of JSON files:
+\*(Nm -wt *.json
+.
+.\" ======================================================
 .SH EXIT STATUS
 If a specified filename couldn't be accessed or located, the program exits with an error code of \fB2\fP.
+.\" ======================================================
 .SH AUTHOR
-Copyright (c) 2016 John Gardner <\fIgardnerjohng@gmail.com\fP>.
+Copyright \(co 2015\-2018 John Gardner <\fIgardnerjohng@gmail.com\fP>.
 .PP
-Freely released under the ISC license. See also \fIhttp://opensource.org/licenses/ISC\fP.
+Freely released under the ISC license.
+See also \fIhttp://opensource.org/licenses/ISC\fP.
