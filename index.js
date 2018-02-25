@@ -372,13 +372,58 @@ function print(input){
 	if(writeBack) return;
 	
 	// Determine if the output should be piped through to a pager
-	if(pagedView && input.match(/\n/g).length > process.stdout.rows){
-		const less  = ChildProcess.spawn("less", ["-Ri"], {
-			stdio: ["pipe", process.stdout, process.stderr]
+	const pagerInfo = resolvePagerInfo();
+	if(null !== pagerInfo && input.match(/\n/g).length > process.stdout.rows){
+		const [name, ...argv] = pagerInfo;
+		const pager = ChildProcess.spawn(name, argv, {
+			stdio: ["pipe", process.stdout, process.stderr],
+			detached: true,
 		});
-		less.stdin.write(input);
-		less.stdin.end();
+		pager.stdin.write(input);
+		pager.stdin.end();
 	}
 
 	else process.stdout.write(input);
+}
+
+
+/**
+ * Determine which program the system uses to display paged output.
+ *
+ * @return {String[]}
+ * @internal
+ */
+function resolvePagerInfo(){
+	const {env, stdout} = process;
+	if(!pagedView || !stdout.rows) return null;
+	if(env.PAGER)     return env.PAGER.split(/\s+/);
+	if(which("less")) return ["less", "-Ri"];
+	if(which("more")) return ["more"];
+	return null;
+}
+
+
+/**
+ * Locate a program file in the user's $PATH.
+ *
+ * @example which("curl") == "/usr/bin/curl"
+ * @example which("nada") == ""
+ * @param {String} name
+ * @return {String}
+ */
+function which(name){
+	if(!name) return "";
+	const {execSync} = require("child_process");
+	const commandStr = "win32" === process.platform
+		? `@for %g in (ECHO ${name.replace(/%/g, "%%")}) do`
+			+ " @for %e in (%PATHEXT%) do"
+			+ " @for %i in (%g%e) do "
+			+ ' @if NOT "%~$PATH:i"=="" echo %~$PATH:i'
+		: `command -v '${name.replace(/'/g, `'"'"'`)}' 2>/dev/null`;
+	try{
+		const output = execSync(commandStr, {windowsHide: true});
+		return output.toString().split(/\r?\n/).filter(Boolean)[0] || "";
+	} catch(e){
+		return "";
+	}
 }
